@@ -105,6 +105,7 @@ if __name__ == "__main__":
 		if len(args) == 2:
 			load_path = args[1]
 			agent.load(load_path)
+			agent.train_target()
 			print('Successfully loaded: ' + load_path)
 		else:
 			print('$ agents.py <load_path>')
