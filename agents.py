@@ -10,8 +10,8 @@ import random
 from datetime import datetime
 
 ENV_NAME = "Breakout-v0" # Environment name
-NUM_EPISODES = 12000  # Number of episodes
-NUM_EPOCHS = 1 # number of iterations over the data set
+NUM_EPISODES = 100000  # Number of episodes
+NUM_EPOCHS = 2 # number of iterations over the data set
 
 FRAME_WIDTH = 84  # Frame width
 FRAME_HEIGHT = 84  # Frame height
@@ -25,15 +25,16 @@ TARGET_UPDATE_INTERVAL = 10000  # The frequency with which the target network is
 
 INITIAL_EPSILON = 1.0  # Initial value of epsilon in epsilon-greedy
 FINAL_EPSILON = 0.1  # Final value of epsilon in epsilon-greedy
-EPSILON_DECAY = 0.995 # Decay rate of epsilon per step
+EPSILON_DECAY = 0.999 # Decay rate of epsilon per step
 
-INITIAL_REPLAY_SIZE = 20000  # Number of steps to fill replay memory
-NUM_REPLAY_MEMORY = 400000  # Size of replay memory
+INITIAL_REPLAY_SIZE = 50000  # Number of steps to fill replay memory
+NUM_REPLAY_MEMORY = 1000000  # Size of replay memory
 
 LOAD_NETWORK = True
 SAVE_PATH = 'saved_models/'
-SAVE_INTERVAL = 100  
-RENDER = False
+SAVE_INTERVAL = 100
+DEBUG_INTERVAL = 50
+RENDER = True
 
 class Agent:
 
@@ -61,7 +62,7 @@ class Agent:
 
 	def train(self):
 		(state_batch, action_batch, reward_batch, next_state_batch, done_batch) = self.replay_buffer.sample(BATCH_SIZE)
-		done_batch = done_batch + 0     
+		done_batch = done_batch + 0
 
 		q_batch = reward_batch + (1 - done_batch) * GAMMA * np.amax(self.target_network.predict(np.float32(np.array(next_state_batch) / 255.0)))
 		y_batch = self.model.predict(np.float32(np.array(state_batch) / 255.0))
@@ -129,11 +130,13 @@ if __name__ == "__main__":
 			agent.reinfoce(observation, action, reward, next_observation, done)
 			observation = next_observation
 			t += 1
-		print("episode: {}/{}, done: {}".format(e, NUM_EPISODES, t))
+
+		if e % DEBUG_INTERVAL == 0:
+			print("episode: {}/{}, done: {}".format(e, NUM_EPISODES, t), flush=True)
 
 		if e % SAVE_INTERVAL == 0:
 			save_path = SAVE_PATH + ENV_NAME + "-" + str(e)
 			agent.save(save_path)
-			print('Successfully saved: ' + save_path)
+			print('Successfully saved: ' + save_path, flush=True)
 
 
