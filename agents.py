@@ -1,4 +1,5 @@
 import gym
+from gym import wrappers
 import numpy as np
 
 from replay_buffer import ReplayBuffer
@@ -35,6 +36,7 @@ SAVE_PATH = 'saved_models/'
 SAVE_INTERVAL = 100
 DEBUG_INTERVAL = 50
 RENDER = True
+RECORD = True
 
 class Agent:
 
@@ -99,6 +101,8 @@ class Agent:
 
 if __name__ == "__main__":
 	env = gym.make(ENV_NAME)
+	if RECORD:
+		env = wrappers.Monitor(env, '/tmp/' + ENV_NAME + '-experiment')
 	agent = Agent(env.action_space.n)
 
 	if LOAD_NETWORK:
