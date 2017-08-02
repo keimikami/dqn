@@ -10,13 +10,6 @@ import sys
 import random
 from datetime import datetime
 
-
-
-np.set_printoptions(threshold=np.inf)
-
-
-
-
 ENV_NAME = "Breakout-v0" # Environment name
 NUM_EPISODES = 100000  # Number of episodes
 NUM_EPOCHS = 1 # number of iterations over the data set
