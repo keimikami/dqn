@@ -114,21 +114,24 @@ if __name__ == "__main__":
 
 	for e in range(1, NUM_EPISODES + 1):
 		observation = env.reset()
+		last_observation = None
 		done = False
 
 		for _ in range(random.randint(1, WAITING_STEPS)):
+			last_observation = observation
 			observation, _, _, _ = env.step(0)
-		observation = preprocess(observation, FRAME_WIDTH, FRAME_HEIGHT)
+		state = preprocess(observation, last_observation, FRAME_WIDTH, FRAME_HEIGHT)
 
 		t = 0
 		while not done:
+			action = agent.select_action(state)
+			last_observation = observation
+			observation, reward, done, _ = env.step(action)
 			if RENDER:
-				env.render()
-			action = agent.select_action(observation)
-			next_observation, reward, done, _ = env.step(action)
-			next_observation = preprocess(next_observation, FRAME_WIDTH, FRAME_HEIGHT)
-			agent.reinfoce(observation, action, reward, next_observation, done)
-			observation = next_observation
+				env.render()	
+			next_state = preprocess(observation, last_observation, FRAME_WIDTH, FRAME_HEIGHT)
+			agent.reinfoce(state, action, reward, next_state, done)
+			state = next_state
 			t += 1
 
 		if e % DEBUG_INTERVAL == 0:
