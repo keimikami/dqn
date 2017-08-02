@@ -10,9 +10,16 @@ import sys
 import random
 from datetime import datetime
 
+
+
+np.set_printoptions(threshold=np.inf)
+
+
+
+
 ENV_NAME = "Breakout-v0" # Environment name
 NUM_EPISODES = 100000  # Number of episodes
-NUM_EPOCHS = 2 # number of iterations over the data set
+NUM_EPOCHS = 1 # number of iterations over the data set
 
 FRAME_WIDTH = 84  # Frame width
 FRAME_HEIGHT = 84  # Frame height
@@ -31,12 +38,12 @@ EPSILON_DECAY = 0.999 # Decay rate of epsilon per step
 INITIAL_REPLAY_SIZE = 50000  # Number of steps to fill replay memory
 NUM_REPLAY_MEMORY = 1000000  # Size of replay memory
 
-LOAD_NETWORK = True
+LOAD_NETWORK = False
 SAVE_PATH = 'saved_models/'
-SAVE_INTERVAL = 100
+SAVE_INTERVAL = 1000
 DEBUG_INTERVAL = 50
-RENDER = True
-RECORD = True
+RENDER = False
+RECORD = False
 
 class Agent:
 
@@ -64,10 +71,13 @@ class Agent:
 
 	def train(self):
 		(state_batch, action_batch, reward_batch, next_state_batch, done_batch) = self.replay_buffer.sample(BATCH_SIZE)
+		
+		state_batch = np.float32(state_batch / 255.0)
+		next_state_batch = np.float32(next_state_batch / 255.0)
 		done_batch = done_batch + 0
 
-		q_batch = reward_batch + (1 - done_batch) * GAMMA * np.amax(self.target_network.predict(np.float32(np.array(next_state_batch) / 255.0)))
-		y_batch = self.model.predict(np.float32(np.array(state_batch) / 255.0))
+		q_batch = reward_batch + (1 - done_batch) * GAMMA * np.amax(self.target_network.predict(next_state_batch))
+		y_batch = self.model.predict(state_batch)
 
 		for i in range(BATCH_SIZE):
 			y_batch[i][action_batch[i]] = q_batch[i]
@@ -96,8 +106,6 @@ class Agent:
 
 	def save(self, name):
 		self.model.save_weights(name)
-
-
 
 if __name__ == "__main__":
 	env = gym.make(ENV_NAME)
