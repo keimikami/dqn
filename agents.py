@@ -26,7 +26,7 @@ TARGET_UPDATE_INTERVAL = 10000  # The frequency with which the target network is
 
 INITIAL_EPSILON = 1.0  # Initial value of epsilon in epsilon-greedy
 FINAL_EPSILON = 0.1  # Final value of epsilon in epsilon-greedy
-EPSILON_DECAY = 0.999 # Decay rate of epsilon per step
+EXPLORATION_STEPS = 1000000  # Number of steps to decay epsilon
 
 INITIAL_REPLAY_SIZE = 50000  # Number of steps to fill replay memory
 NUM_REPLAY_MEMORY = 1000000  # Size of replay memory
@@ -45,6 +45,7 @@ class Agent:
 		self.step = 0
 		self.replay_buffer = ReplayBuffer(NUM_REPLAY_MEMORY)
 		self.epsilon = INITIAL_EPSILON
+		self.epsilon_step = (INITIAL_EPSILON - FINAL_EPSILON) / EXPLORATION_STEPS
 
 		self.model = build_network(FRAME_WIDTH, FRAME_HEIGHT, 1, self.num_actions)
 		self.target_network = build_network(FRAME_WIDTH, FRAME_HEIGHT, 1, self.num_actions)
@@ -58,7 +59,7 @@ class Agent:
 			action = np.argmax(q_values[0])
 
 		if self.epsilon > FINAL_EPSILON and self.step >= INITIAL_REPLAY_SIZE:
-			self.epsilon *= EPSILON_DECAY
+			self.epsilon -= self.epsilon_step
 
 		return action
 
@@ -140,7 +141,7 @@ if __name__ == "__main__":
 			t += 1
 
 		if e % DEBUG_INTERVAL == 0:
-			print("episode: {}/{}, done: {}".format(e, NUM_EPISODES, t), flush=True)
+			print("episode: {}/{}, t: {}, epsilon: {:.5f}".format(e, NUM_EPISODES, t, agent.epsilon), flush=True)
 
 		if e % SAVE_INTERVAL == 0:
 			save_path = SAVE_PATH + ENV_NAME + "-" + str(e)
