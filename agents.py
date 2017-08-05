@@ -55,7 +55,7 @@ class Agent:
 		if random.random() <= self.epsilon:
 			action = random.randrange(self.num_actions)
 		else:
-			q_values = self.model.predict(np.reshape(state, (1, FRAME_WIDTH, FRAME_HEIGHT, 1)))
+			q_values = self.model.predict(np.reshape(np.float32(state / 255.0), (1, FRAME_WIDTH, FRAME_HEIGHT, 1)))
 			action = np.argmax(q_values[0])
 
 		if self.epsilon > FINAL_EPSILON and self.step >= INITIAL_REPLAY_SIZE:
