@@ -35,7 +35,7 @@ LOAD_NETWORK = False
 SAVE_PATH = 'saved_models/'
 SAVE_INTERVAL = 1000
 DEBUG_INTERVAL = 50
-RENDER = False
+RENDER = True
 RECORD = False
 
 class Agent:
@@ -141,11 +141,11 @@ if __name__ == "__main__":
 			t += 1
 
 		if e % DEBUG_INTERVAL == 0:
-			print("episode: {}/{}, t: {}, epsilon: {:.5f}".format(e, NUM_EPISODES, t, agent.epsilon), flush=True)
+			print("episode: {}/{}, t: {}, epsilon: {:.5f}".format(e, NUM_EPISODES, t, agent.epsilon))
 
 		if e % SAVE_INTERVAL == 0:
 			save_path = SAVE_PATH + ENV_NAME + "-" + str(e)
 			agent.save(save_path)
-			print('Successfully saved: ' + save_path, flush=True)
+			print('Successfully saved: ' + save_path)
 
 
